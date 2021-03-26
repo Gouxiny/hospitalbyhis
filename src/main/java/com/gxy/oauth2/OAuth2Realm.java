@@ -11,12 +11,16 @@ import org.springframework.stereotype.Component;
 
 import com.gxy.entity.SysUser;
 import com.gxy.entity.SysUserToken;
+import com.gxy.utils.RedisUtils;
 
 import java.util.Set;
 
 @Component
 public class OAuth2Realm extends AuthorizingRealm {
 
+	@Autowired
+	private RedisUtils redisutil;
+	
     @Override
     public boolean supports(AuthenticationToken token) {
         return token instanceof OAuth2Token;
