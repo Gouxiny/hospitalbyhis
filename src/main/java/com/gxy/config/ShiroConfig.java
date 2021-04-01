@@ -53,9 +53,9 @@ public class ShiroConfig {
         shiroFilter.setFilters(filters);
 
         Map<String, String> filterMap = new LinkedHashMap<>();
-        filterMap.put("/ftq/login", "anon");
-        filterMap.put("/ftq/logout", "anon");
-        filterMap.put("/ftq/Register/**", "anon");
+        filterMap.put("/login", "anon");
+        filterMap.put("/logout", "anon");
+        filterMap.put("/Register/**", "anon");
         filterMap.put("/**", "oauth2");
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 

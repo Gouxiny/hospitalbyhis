@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gxy.dao.SysUserDao">
+
+	<select id="findByUsername" resultType="SysUser" parameterType="RData">
+		select user_id userId,username,
+       password,name,
+       status,
+       departmentId 
+       from SYS_USER where username = #{username} and departmentId is not null
+	</select>
+	
+	<select id="findById" resultType="SysUser" parameterType="RData">
+		select user_id userId,username,
+       password,name,rights,
+       role_id,last_login,ip,status,
+       bz,skin,email,phone,company_type_code,
+       department_id 
+       from sys_user where user_id = #{userId}
+	</select>
+
+	<insert id="save" parameterType="SysLoginForm">
+		insert into SYS_USER(username,password,name,departmentId,status) 
+		VALUES(
+		#{username},
+		#{password},
+		#{name},
+		#{departmentId},
+		#{status}
+		)
+	</insert>
+	
+	<update id="edit" parameterType="SysLoginForm" >
+		update SYS_USER 
+		set username=#{username},
+		password=#{password},
+		name=#{name},
+		departmentId=#{departmentId},
+		status=#{status}
+		where user_id = #{userId}
+	</update>
+
+
+
+
+</mapper>

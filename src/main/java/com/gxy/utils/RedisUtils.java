@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,12 +13,14 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+
+import com.gxy.entity.SysUserToken;
 @Service
 public class RedisUtils {
     @Autowired
     private RedisTemplate redisTemplate;
     /**
-     * 写入缓存
+     * *写入缓存
      * @param key
      * @param value
      * @return
@@ -34,7 +37,7 @@ public class RedisUtils {
         return result;
     }
     /**
-     * 写入缓存设置时效时间
+     * *写入缓存设置时效时间
      * @param key
      * @param value
      * @return
@@ -98,6 +101,18 @@ public class RedisUtils {
         result = operations.get(key);
         return result;
     }
+    /**
+     * * 获取token
+     * @param key
+     * @return  
+     */
+    public SysUserToken getToken(String key) {
+    	SysUserToken result = null;
+        ValueOperations<Serializable, SysUserToken> operations = redisTemplate.opsForValue();
+        result = (SysUserToken) operations.get(key);
+    	return result;
+    }
+    
     /**
      * 哈希 添加
      * @param key

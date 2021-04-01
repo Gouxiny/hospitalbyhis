@@ -3,23 +3,27 @@ package com.gxy.oauth2;
 
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
+import com.google.gson.annotations.JsonAdapter;
 import com.gxy.entity.SysUser;
 import com.gxy.entity.SysUserToken;
+import com.gxy.service.ShiroService;
 import com.gxy.utils.RedisUtils;
 
-import java.util.Set;
 
 @Component
 public class OAuth2Realm extends AuthorizingRealm {
 
 	@Autowired
 	private RedisUtils redisutil;
+	
+	@Autowired
+	private ShiroService shiroService;
 	
     @Override
     public boolean supports(AuthenticationToken token) {
@@ -49,19 +53,24 @@ public class OAuth2Realm extends AuthorizingRealm {
 
         //根据accessToken，
         //查询用户信息
-        SysUserToken userToken = null;
+        SysUserToken userToken = (SysUserToken) redisutil.get("token"+accessToken);
         //token失效
-        if(userToken == null || userToken.getExpireTime().getTime() < System.currentTimeMillis()){
+        if(((SysUserToken) userToken) == null || ((SysUserToken) userToken).getExpireTime().getTime() < System.currentTimeMillis()){
             throw new IncorrectCredentialsException("token失效，请重新登录");
         }
-//        SysUser user = shiroService.queryUser(userToken.getUserId());
-
-//        if(user.getStatus() == "0"){
-//            throw new LockedAccountException("账号已被锁定,请联系管理员");
-//        }
-//        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, accessToken, getName());
-//        return info;
-        return null;
+        SysUser user = new SysUser();
+        try{
+        	 user = (SysUser) redisutil.get(((SysUserToken) userToken).getUserId());
+        }catch (Exception e) {
+			// TODO: handle exception
+        	 user = shiroService.queryByUser(((SysUserToken) userToken).getUserId());
+        	 redisutil.set(((SysUserToken) userToken).getUserId(), user);
+		}
+        if(user.getStatus().toString() == "0"){
+            throw new LockedAccountException("账号已被锁定,请联系管理员");
+        }
+        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, accessToken, getName());
+        return info;
     }
 
 	@Override
